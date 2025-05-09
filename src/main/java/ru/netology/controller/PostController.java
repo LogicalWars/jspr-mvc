@@ -1,14 +1,13 @@
 package ru.netology.controller;
 
 import com.google.gson.Gson;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.netology.model.Post;
 import ru.netology.service.PostService;
-
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.Reader;
 
 @Controller
 @RequestMapping("/api/posts")
@@ -29,7 +28,7 @@ public class PostController {
   }
 
   @GetMapping("/{id}")
-  public void getById(@PathVariable long id, HttpServletResponse response) throws IOException {
+  public void getById(@PathVariable("id") long id, HttpServletResponse response) throws IOException {
     response.setContentType(APPLICATION_JSON);
     final var data = service.getById(id);
     final var gson = new Gson();
@@ -37,16 +36,16 @@ public class PostController {
   }
 
   @PostMapping
-  public void save(Reader body, HttpServletResponse response) throws IOException {
+  public void save(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType(APPLICATION_JSON);
     final var gson = new Gson();
-    final var post = gson.fromJson(body, Post.class);
+    final var post = gson.fromJson(request.getReader(), Post.class);
     final var data = service.save(post);
     response.getWriter().print(gson.toJson(data));
   }
 
   @DeleteMapping("/{id}")
-  public void removeById(@PathVariable long id, HttpServletResponse response) throws IOException {
+  public void removeById(@PathVariable("id") long id, HttpServletResponse response) throws IOException {
     response.setContentType(APPLICATION_JSON);
     service.removeById(id);
     response.getWriter().print("200 OK");
